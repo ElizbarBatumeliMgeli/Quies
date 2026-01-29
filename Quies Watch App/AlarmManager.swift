@@ -26,15 +26,15 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     
     // MARK: - Dependencies
     private var bioSensors = BioSensors()
+    private var widgetManager = WidgetManager()
     private var timer: Timer?
     private var session: WKExtendedRuntimeSession?
-    
-    // Haptic Engine Only
     private var hapticTimer: Timer?
     
     // MARK: - Configuration
-    private let smartWindowSeconds: TimeInterval = 30 * 60 // 30 Minutes
+    private let smartWindowSeconds: TimeInterval = 30 * 60
     private var startTime: Date?
+    private var backgroundTaskIdentifier: String?
     
     // MARK: - Feature 1: Naps
     func startNap(duration: TimeInterval) {
@@ -73,12 +73,16 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         self.statusMessage = "Starting Session..."
         
         let windowStart = wakeTime.addingTimeInterval(-smartWindowSeconds)
+        let now = Date()
         
-        if windowStart < Date() {
-            startExtendedSession(at: Date())
+        widgetManager.updateWidget(wakeTime: wakeTime, mode: mode, isActive: true)
+        
+        if windowStart < now {
+            startExtendedSession(at: now)
             bioSensors.startMonitoring()
         } else {
-            startExtendedSession(at: windowStart)
+            scheduleBackgroundTask(for: windowStart)
+            scheduleWakeUpNotification(at: windowStart)
         }
         
         scheduleBackupNotification(at: wakeTime)
@@ -90,7 +94,9 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         session?.invalidate()
         session = nil
         
-        cancelBackupNotification()
+        cancelAllNotifications()
+        cancelBackgroundTask()
+        widgetManager.clearWidget()
         bioSensors.stopMonitoring()
         timer?.invalidate()
         stopAlarmSequence()
@@ -101,6 +107,65 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
             self.timerString = "--:--"
             self.targetWakeTime = nil
         }
+    }
+    
+    // MARK: - Background Task Scheduling
+    private func scheduleBackgroundTask(for date: Date) {
+        let bufferTime: TimeInterval = 5 * 60
+        let taskDate = date.addingTimeInterval(-bufferTime)
+        
+        if taskDate > Date() {
+            let identifier = "com.quies.wake-\(UUID().uuidString)"
+            backgroundTaskIdentifier = identifier
+            
+            let userInfo = NSDictionary(dictionary: ["wakeTime": date.timeIntervalSince1970])
+            
+            WKApplication.shared().scheduleBackgroundRefresh(
+                withPreferredDate: taskDate,
+                userInfo: userInfo
+            ) { error in
+                if let error = error {
+                    print("Failed to schedule background task: \(error)")
+                }
+            }
+        }
+    }
+    
+    private func cancelBackgroundTask() {
+        backgroundTaskIdentifier = nil
+    }
+    
+    // MARK: - Handle Background Task
+    func handleBackgroundTask(task: WKApplicationRefreshBackgroundTask) {
+        guard let wakeTime = targetWakeTime else {
+            task.setTaskCompletedWithSnapshot(false)
+            return
+        }
+        
+        let windowStart = wakeTime.addingTimeInterval(-smartWindowSeconds)
+        
+        if Date() >= windowStart {
+            startExtendedSession(at: Date())
+            bioSensors.startMonitoring()
+        }
+        
+        task.setTaskCompletedWithSnapshot(false)
+    }
+    
+    // MARK: - Wake Up Notification
+    private func scheduleWakeUpNotification(at date: Date) {
+        let content = UNMutableNotificationContent()
+        content.title = "Sleep Tracking Starting"
+        content.body = "Quies is now monitoring your sleep"
+        content.sound = nil
+        content.categoryIdentifier = "WAKE_APP"
+        
+        let interval = date.timeIntervalSince(Date())
+        if interval <= 0 { return }
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+        let request = UNNotificationRequest(identifier: "WAKE_UP_APP", content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request) { _ in }
     }
     
     // MARK: - Extended Runtime Session
@@ -130,8 +195,9 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     private func scheduleBackupNotification(at date: Date) {
         let content = UNMutableNotificationContent()
         content.title = "Wake Up!"
-        content.body = "NapGuard Backup Alarm"
+        content.body = "Quies Backup Alarm"
         content.sound = UNNotificationSound.default
+        content.categoryIdentifier = "ALARM"
         
         let interval = date.timeIntervalSince(Date())
         if interval <= 0 { return }
@@ -141,8 +207,8 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         UNUserNotificationCenter.current().add(request) { _ in }
     }
     
-    private func cancelBackupNotification() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["BACKUP_ALARM"])
+    private func cancelAllNotifications() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["BACKUP_ALARM", "WAKE_UP_APP"])
     }
     
     // MARK: - Timer Loop
@@ -167,7 +233,7 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         }
     }
     
-    // MARK: - 🚨 TOTAL ALARM (Haptic Loop Only) 🚨
+    // MARK: - Total Alarm
     private func triggerTotalAlarm(reason: String) {
         guard hapticTimer == nil else { return }
         
@@ -186,12 +252,9 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     private func startHapticLoop() {
         hapticTimer?.invalidate()
         
-        // Initial Thud
         WKInterfaceDevice.current().play(.failure)
         
-        // Loop every 1.5 seconds
         hapticTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { _ in
-            // Strong vibration pattern
             WKInterfaceDevice.current().play(.failure)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {

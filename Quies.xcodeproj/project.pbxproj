@@ -7,10 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A0FCC782F2B7070007C2D7F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A0FCC772F2B7070007C2D7F /* WidgetKit.framework */; };
+		1A0FCC7A2F2B7070007C2D7F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A0FCC792F2B7070007C2D7F /* SwiftUI.framework */; };
+		1A0FCC892F2B7071007C2D7F /* QuiesWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1A0FCC752F2B7070007C2D7F /* QuiesWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1A19BD4A2F222BE8001E926D /* Quies Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1A19BD492F222BE8001E926D /* Quies Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1A0FCC872F2B7071007C2D7F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1A19BD3D2F222BE8001E926D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A0FCC742F2B7070007C2D7F;
+			remoteInfo = QuiesWidgetExtensionExtension;
+		};
 		1A19BD4B2F222BE8001E926D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1A19BD3D2F222BE8001E926D /* Project object */;
@@ -21,6 +31,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		1A0FCC8E2F2B7071007C2D7F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1A0FCC892F2B7071007C2D7F /* QuiesWidgetExtensionExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1A19BD592F222BE9001E926D /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -35,19 +56,70 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1A0FCC752F2B7070007C2D7F /* QuiesWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QuiesWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A0FCC772F2B7070007C2D7F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		1A0FCC792F2B7070007C2D7F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		1A0FCC992F2B752E007C2D7F /* QuiesWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuiesWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
 		1A19BD432F222BE8001E926D /* Quies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quies.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A19BD492F222BE8001E926D /* Quies Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quies Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1A0FCC8A2F2B7071007C2D7F /* Exceptions for "QuiesWidgetExtension" folder in "QuiesWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1A0FCC742F2B7070007C2D7F /* QuiesWidgetExtensionExtension */;
+		};
+		1A0FCCA02F2B76E4007C2D7F /* Exceptions for "Quies Watch App" folder in "QuiesWidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AlarmManager.swift,
+				BioSensor.swift,
+			);
+			target = 1A0FCC742F2B7070007C2D7F /* QuiesWidgetExtensionExtension */;
+		};
+		1A0FCCA32F2B76F7007C2D7F /* Exceptions for "QuiesWidgetExtension" folder in "Quies Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				QuiesWidgetAttributes.swift,
+				WidgetManager.swift,
+			);
+			target = 1A19BD482F222BE8001E926D /* Quies Watch App */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		1A0FCC7B2F2B7070007C2D7F /* QuiesWidgetExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1A0FCCA32F2B76F7007C2D7F /* Exceptions for "QuiesWidgetExtension" folder in "Quies Watch App" target */,
+				1A0FCC8A2F2B7071007C2D7F /* Exceptions for "QuiesWidgetExtension" folder in "QuiesWidgetExtensionExtension" target */,
+			);
+			path = QuiesWidgetExtension;
+			sourceTree = "<group>";
+		};
 		1A19BD4D2F222BE8001E926D /* Quies Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1A0FCCA02F2B76E4007C2D7F /* Exceptions for "Quies Watch App" folder in "QuiesWidgetExtensionExtension" target */,
+			);
 			path = "Quies Watch App";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1A0FCC722F2B7070007C2D7F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1A0FCC7A2F2B7070007C2D7F /* SwiftUI.framework in Frameworks */,
+				1A0FCC782F2B7070007C2D7F /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1A19BD462F222BE8001E926D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -58,10 +130,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1A0FCC762F2B7070007C2D7F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1A0FCC772F2B7070007C2D7F /* WidgetKit.framework */,
+				1A0FCC792F2B7070007C2D7F /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1A19BD3C2F222BE8001E926D = {
 			isa = PBXGroup;
 			children = (
+				1A0FCC992F2B752E007C2D7F /* QuiesWidgetExtensionExtension.entitlements */,
 				1A19BD4D2F222BE8001E926D /* Quies Watch App */,
+				1A0FCC7B2F2B7070007C2D7F /* QuiesWidgetExtension */,
+				1A0FCC762F2B7070007C2D7F /* Frameworks */,
 				1A19BD442F222BE8001E926D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,6 +155,7 @@
 			children = (
 				1A19BD432F222BE8001E926D /* Quies.app */,
 				1A19BD492F222BE8001E926D /* Quies Watch App.app */,
+				1A0FCC752F2B7070007C2D7F /* QuiesWidgetExtensionExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -78,6 +163,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1A0FCC742F2B7070007C2D7F /* QuiesWidgetExtensionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A0FCC8B2F2B7071007C2D7F /* Build configuration list for PBXNativeTarget "QuiesWidgetExtensionExtension" */;
+			buildPhases = (
+				1A0FCC712F2B7070007C2D7F /* Sources */,
+				1A0FCC722F2B7070007C2D7F /* Frameworks */,
+				1A0FCC732F2B7070007C2D7F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1A0FCC7B2F2B7070007C2D7F /* QuiesWidgetExtension */,
+			);
+			name = QuiesWidgetExtensionExtension;
+			packageProductDependencies = (
+			);
+			productName = QuiesWidgetExtensionExtension;
+			productReference = 1A0FCC752F2B7070007C2D7F /* QuiesWidgetExtensionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		1A19BD422F222BE8001E926D /* Quies */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1A19BD5A2F222BE9001E926D /* Build configuration list for PBXNativeTarget "Quies" */;
@@ -104,10 +211,12 @@
 				1A19BD452F222BE8001E926D /* Sources */,
 				1A19BD462F222BE8001E926D /* Frameworks */,
 				1A19BD472F222BE8001E926D /* Resources */,
+				1A0FCC8E2F2B7071007C2D7F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1A0FCC882F2B7071007C2D7F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1A19BD4D2F222BE8001E926D /* Quies Watch App */,
@@ -126,9 +235,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					1A0FCC742F2B7070007C2D7F = {
+						CreatedOnToolsVersion = 26.2;
+					};
 					1A19BD422F222BE8001E926D = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
@@ -153,11 +265,19 @@
 			targets = (
 				1A19BD422F222BE8001E926D /* Quies */,
 				1A19BD482F222BE8001E926D /* Quies Watch App */,
+				1A0FCC742F2B7070007C2D7F /* QuiesWidgetExtensionExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1A0FCC732F2B7070007C2D7F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1A19BD412F222BE8001E926D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -175,6 +295,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1A0FCC712F2B7070007C2D7F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1A19BD452F222BE8001E926D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -185,6 +312,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1A0FCC882F2B7071007C2D7F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A0FCC742F2B7070007C2D7F /* QuiesWidgetExtensionExtension */;
+			targetProxy = 1A0FCC872F2B7071007C2D7F /* PBXContainerItemProxy */;
+		};
 		1A19BD4C2F222BE8001E926D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 1A19BD482F222BE8001E926D /* Quies Watch App */;
@@ -193,6 +325,75 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		1A0FCC8C2F2B7071007C2D7F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = QuiesWidgetExtensionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = R2WDS6ZMQ6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = QuiesWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = QuiesWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Alpha123.Quies.watchkitapp.QuiesWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		1A0FCC8D2F2B7071007C2D7F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = QuiesWidgetExtensionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = R2WDS6ZMQ6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = QuiesWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = QuiesWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Alpha123.Quies.watchkitapp.QuiesWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
 		1A19BD542F222BE9001E926D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -426,6 +627,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1A0FCC8B2F2B7071007C2D7F /* Build configuration list for PBXNativeTarget "QuiesWidgetExtensionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A0FCC8C2F2B7071007C2D7F /* Debug */,
+				1A0FCC8D2F2B7071007C2D7F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1A19BD402F222BE8001E926D /* Build configuration list for PBXProject "Quies" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

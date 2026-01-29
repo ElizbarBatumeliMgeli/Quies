@@ -12,28 +12,24 @@ struct OnboardingView: View {
     
     var body: some View {
         TabView {
-            // PAGE 1: Intro
             OnboardingPage(
                 icon: "waveform.path.ecg",
                 title: "Welcome to Quies",
                 description: "Your smart companion for better rest and energized wake-ups."
             )
             
-            // PAGE 2: Naps
             OnboardingPage(
                 icon: "moon.zzz.fill",
                 title: "Power Naps",
                 description: "Quick preset timers (1h–2.5h) designed to recharge you without grogginess."
             )
             
-            // PAGE 3: Alarm
             OnboardingPage(
                 icon: "alarm.waves.left.and.right.fill",
                 title: "Smart Wake",
                 description: "Detects your lightest sleep phase within 30 mins to wake you gently."
             )
             
-            // PAGE 4: Disclaimer & Start (SCROLLABLE NOW)
             ScrollView {
                 VStack(spacing: 15) {
                     Image(systemName: "exclamationmark.shield.fill")
