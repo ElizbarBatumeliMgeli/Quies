@@ -7,12 +7,30 @@
 		<key>Quies Watch App.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>1</integer>
 		</dict>
 		<key>QuiesWidgetExtensionExtension.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>1A0FCC742F2B7070007C2D7F</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>1A19BD422F222BE8001E926D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>1A19BD482F222BE8001E926D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
