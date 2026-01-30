@@ -58,6 +58,11 @@ struct ContentView: View {
                 .clipShape(Capsule())
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("HandleBackgroundTask"))) { notification in
+            if let task = notification.object as? WKApplicationRefreshBackgroundTask {
+                alarmManager.handleBackgroundTask(task: task)
+            }
+        }
     }
     
     var mainAppView: some View {

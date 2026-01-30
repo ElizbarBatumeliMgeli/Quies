@@ -29,8 +29,8 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     private var widgetManager = WidgetManager()
     private var timer: Timer?
     private var session: WKExtendedRuntimeSession?
-    
     private var hapticTimer: Timer?
+    private var keepAliveTimer: Timer?
     
     // MARK: - Configuration
     private let smartWindowSeconds: TimeInterval = 30 * 60
@@ -70,17 +70,21 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     private func activateAlarm(mode: AppMode, wakeTime: Date) {
         self.currentMode = mode
         self.targetWakeTime = wakeTime
-        self.statusMessage = "Starting Session..."
+        self.statusMessage = "Alarm Set"
         
         let windowStart = wakeTime.addingTimeInterval(-smartWindowSeconds)
+        let now = Date()
         
         widgetManager.updateWidget(wakeTime: wakeTime, mode: mode, isActive: true)
         
-        if windowStart < Date() {
-            startExtendedSession(at: Date())
+        if windowStart <= now {
+            startExtendedSession(at: now)
             bioSensors.startMonitoring()
+            self.statusMessage = "Scanning Sleep..."
         } else {
-            startExtendedSession(at: windowStart)
+            scheduleBackgroundTask(for: windowStart)
+            scheduleWakeNotification(at: windowStart)
+            startKeepAliveTimer()
         }
         
         scheduleBackupNotification(at: wakeTime)
@@ -93,6 +97,9 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         session = nil
         
         cancelBackupNotification()
+        cancelWakeNotification()
+        cancelBackgroundTask()
+        stopKeepAliveTimer()
         widgetManager.clearWidget()
         bioSensors.stopMonitoring()
         timer?.invalidate()
@@ -106,12 +113,114 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         }
     }
     
+    // MARK: - Background Task Scheduling
+    private func scheduleBackgroundTask(for date: Date) {
+        let bufferTime: TimeInterval = 5 * 60
+        let taskDate = date.addingTimeInterval(-bufferTime)
+        
+        if taskDate > Date() {
+            let userInfo = NSDictionary(dictionary: ["wakeTime": date.timeIntervalSince1970])
+            
+            WKApplication.shared().scheduleBackgroundRefresh(
+                withPreferredDate: taskDate,
+                userInfo: userInfo
+            ) { error in
+                if let error = error {
+                    print("Failed to schedule background task: \(error)")
+                } else {
+                    print("✅ Background task scheduled for \(taskDate.formatted(date: .omitted, time: .shortened))")
+                }
+            }
+        }
+    }
+    
+    private func cancelBackgroundTask() {
+        print("Background task cancelled")
+    }
+    
+    // MARK: - Handle Background Task
+    func handleBackgroundTask(task: WKApplicationRefreshBackgroundTask) {
+        print("🔄 Background task fired!")
+        
+        guard let wakeTime = targetWakeTime else {
+            task.setTaskCompletedWithSnapshot(false)
+            return
+        }
+        
+        let windowStart = wakeTime.addingTimeInterval(-smartWindowSeconds)
+        
+        if Date() >= windowStart {
+            print("✅ Starting extended session from background task")
+            startExtendedSession(at: Date())
+            bioSensors.startMonitoring()
+            self.statusMessage = "Scanning Sleep..."
+        }
+        
+        task.setTaskCompletedWithSnapshot(false)
+    }
+    
+    // MARK: - Wake Notification
+    private func scheduleWakeNotification(at date: Date) {
+        let content = UNMutableNotificationContent()
+        content.title = "Quies"
+        content.body = "Sleep tracking starting"
+        content.sound = nil
+        content.categoryIdentifier = "QUIES_WAKE"
+        
+        let interval = date.timeIntervalSince(Date())
+        if interval <= 0 { return }
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+        let request = UNNotificationRequest(identifier: "WAKE_NOTIFICATION", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Failed to schedule wake notification: \(error)")
+            } else {
+                print("✅ Wake notification scheduled for \(date.formatted(date: .omitted, time: .shortened))")
+            }
+        }
+    }
+    
+    private func cancelWakeNotification() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["WAKE_NOTIFICATION"])
+    }
+    
+    // MARK: - Keep Alive Timer
+    private func startKeepAliveTimer() {
+        stopKeepAliveTimer()
+        
+        keepAliveTimer = Timer.scheduledTimer(withTimeInterval: 60.0 * 60.0, repeats: true) { [weak self] _ in
+            guard let self = self, let wakeTime = self.targetWakeTime else { return }
+            
+            print("⏰ Keep-alive tick")
+            
+            self.widgetManager.updateWidget(wakeTime: wakeTime, mode: self.currentMode, isActive: true)
+            
+            let windowStart = wakeTime.addingTimeInterval(-self.smartWindowSeconds)
+            if Date() >= windowStart && self.session == nil {
+                print("✅ Starting extended session from keep-alive")
+                self.startExtendedSession(at: Date())
+                self.bioSensors.startMonitoring()
+                self.statusMessage = "Scanning Sleep..."
+            }
+        }
+        
+        print("✅ Keep-alive timer started (updates every hour)")
+    }
+    
+    private func stopKeepAliveTimer() {
+        keepAliveTimer?.invalidate()
+        keepAliveTimer = nil
+    }
+    
     // MARK: - Extended Runtime Session
     private func startExtendedSession(at date: Date) {
         if session != nil { session?.invalidate(); session = nil }
         session = WKExtendedRuntimeSession()
         session?.delegate = self
         session?.start(at: date)
+        stopKeepAliveTimer()
     }
     
     func extendedRuntimeSessionDidStart(_ session: WKExtendedRuntimeSession) {
@@ -119,13 +228,16 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
             self.bioSensors.startMonitoring()
             self.statusMessage = "Scanning Sleep..."
         }
+        print("✅ Extended runtime session started")
     }
     
     func extendedRuntimeSessionWillExpire(_ session: WKExtendedRuntimeSession) {
+        print("⚠️ Extended runtime session expiring")
         triggerTotalAlarm(reason: "Session Expired")
     }
     
     func extendedRuntimeSession(_ session: WKExtendedRuntimeSession, didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason, error: Error?) {
+        print("❌ Extended runtime session invalidated: \(reason)")
         stop()
     }
 
@@ -133,19 +245,47 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     private func scheduleBackupNotification(at date: Date) {
         let content = UNMutableNotificationContent()
         content.title = "Wake Up!"
-        content.body = "NapGuard Backup Alarm"
-        content.sound = UNNotificationSound.default
+        content.body = "Quies Backup Alarm"
+        content.sound = UNNotificationSound.defaultCritical
+        content.categoryIdentifier = "QUIES_ALARM"
+        content.interruptionLevel = .timeSensitive
         
         let interval = date.timeIntervalSince(Date())
-        if interval <= 0 { return }
+        if interval <= 0 {
+            print("⚠️ Cannot schedule notification in the past")
+            return
+        }
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
         let request = UNNotificationRequest(identifier: "BACKUP_ALARM", content: content, trigger: trigger)
-        UNUserNotificationCenter.current().add(request) { _ in }
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Failed to schedule backup alarm: \(error)")
+            } else {
+                print("✅ Backup alarm scheduled for \(date.formatted(date: .omitted, time: .shortened))")
+                self.debugNotifications()
+            }
+        }
     }
     
     private func cancelBackupNotification() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["BACKUP_ALARM"])
+    }
+    
+    // MARK: - Debug Notifications
+    private func debugNotifications() {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            print("📬 Pending notifications: \(requests.count)")
+            for request in requests {
+                if let trigger = request.trigger as? UNTimeIntervalNotificationTrigger {
+                    let fireDate = Date().addingTimeInterval(trigger.timeInterval)
+                    print("   - \(request.identifier): fires at \(fireDate.formatted(date: .omitted, time: .shortened))")
+                } else {
+                    print("   - \(request.identifier): trigger type \(type(of: request.trigger))")
+                }
+            }
+        }
     }
     
     // MARK: - Timer Loop
