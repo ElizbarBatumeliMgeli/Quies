@@ -44,7 +44,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1A19BD422F222BE8001E926D"
+               BlueprintIdentifier = "1AD72AA02F2FACE800FEFE3F"
                BuildableName = "Quies.app"
                BlueprintName = "Quies"
                ReferencedContainer = "container:Quies.xcodeproj">

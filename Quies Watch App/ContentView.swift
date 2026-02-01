@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var selectedTime = Date()
     @State private var isSelectingTime = false
     @State private var selectedTab = 0
+    @StateObject private var connectivityManager = WatchConnectivityManager()
     
     var body: some View {
         NavigationStack {

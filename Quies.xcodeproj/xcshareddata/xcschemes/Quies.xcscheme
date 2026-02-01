@@ -15,20 +15,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1A19BD482F222BE8001E926D"
-               BuildableName = "Quies Watch App.app"
-               BlueprintName = "Quies Watch App"
-               ReferencedContainer = "container:Quies.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "1AD72AA02F2FACE800FEFE3F"
                BuildableName = "Quies.app"
                BlueprintName = "Quies"
@@ -45,7 +31,7 @@
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -64,15 +50,6 @@
             ReferencedContainer = "container:Quies.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1A19BD482F222BE8001E926D"
-            BuildableName = "Quies Watch App.app"
-            BlueprintName = "Quies Watch App"
-            ReferencedContainer = "container:Quies.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -84,9 +61,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1A19BD482F222BE8001E926D"
-            BuildableName = "Quies Watch App.app"
-            BlueprintName = "Quies Watch App"
+            BlueprintIdentifier = "1AD72AA02F2FACE800FEFE3F"
+            BuildableName = "Quies.app"
+            BlueprintName = "Quies"
             ReferencedContainer = "container:Quies.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

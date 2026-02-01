@@ -23,10 +23,10 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     @Published var statusMessage: String = "Ready"
     @Published var timerString: String = "--:--"
     @Published var targetWakeTime: Date?
+    var connectivityManager: WatchConnectivityManager?
     
     // MARK: - Dependencies
     private var bioSensors = BioSensors()
-    private var widgetManager = WidgetManager()
     private var timer: Timer?
     private var session: WKExtendedRuntimeSession?
     
@@ -74,7 +74,6 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         
         let windowStart = wakeTime.addingTimeInterval(-smartWindowSeconds)
         
-        widgetManager.updateWidget(wakeTime: wakeTime, mode: mode, isActive: true)
         
         if windowStart < Date() {
             startExtendedSession(at: Date())
@@ -93,10 +92,11 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         session = nil
         
         cancelBackupNotification()
-        widgetManager.clearWidget()
         bioSensors.stopMonitoring()
         timer?.invalidate()
         stopAlarmSequence()
+        
+        connectivityManager?.sendAlarmStopped()
         
         DispatchQueue.main.async {
             self.currentMode = .idle
@@ -177,6 +177,13 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         self.statusMessage = "WAKE UP! (\(reason))"
         timer?.invalidate()
         
+        let alarm = AlarmData(
+            wakeTime: targetWakeTime ?? Date(),
+            mode: currentMode == .napping ? .nap : .smartAlarm,
+            isActive: false
+        )
+        connectivityManager?.sendAlarmTriggered(alarm)
+        
         print("🚨 TOTAL ALARM TRIGGERED (Haptic) 🚨")
         startHapticLoop()
     }
@@ -211,3 +218,4 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         }
     }
 }
+
