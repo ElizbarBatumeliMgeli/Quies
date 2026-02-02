@@ -21,7 +21,7 @@ struct OnboardingView: View {
             OnboardingPage(
                 icon: "moon.zzz.fill",
                 title: "Power Naps",
-                description: "Quick preset timers (1h–2.5h) designed to recharge you without grogginess."
+                description: "Quick preset timers (1hâ€“2.5h) designed to recharge you without grogginess."
             )
             
             OnboardingPage(

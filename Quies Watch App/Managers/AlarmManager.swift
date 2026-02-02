@@ -26,14 +26,13 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     
     // MARK: - Dependencies
     private var bioSensors = BioSensors()
-    private var widgetManager = WidgetManager()
     private var timer: Timer?
     private var session: WKExtendedRuntimeSession?
     
     private var hapticTimer: Timer?
     
     // MARK: - Configuration
-    private let smartWindowSeconds: TimeInterval = 30 * 60
+    private let smartWindowSeconds: TimeInterval = 30 * 60 // 30 Minutes
     private var startTime: Date?
     
     // MARK: - Feature 1: Naps
@@ -74,8 +73,6 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         
         let windowStart = wakeTime.addingTimeInterval(-smartWindowSeconds)
         
-        widgetManager.updateWidget(wakeTime: wakeTime, mode: mode, isActive: true)
-        
         if windowStart < Date() {
             startExtendedSession(at: Date())
             bioSensors.startMonitoring()
@@ -93,7 +90,6 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         session = nil
         
         cancelBackupNotification()
-        widgetManager.clearWidget()
         bioSensors.stopMonitoring()
         timer?.invalidate()
         stopAlarmSequence()
@@ -170,14 +166,14 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
         }
     }
     
-    // MARK: - Total Alarm
+    // MARK: - ðŸš¨ TOTAL ALARM (Haptic Loop Only) ðŸš¨
     private func triggerTotalAlarm(reason: String) {
         guard hapticTimer == nil else { return }
         
         self.statusMessage = "WAKE UP! (\(reason))"
         timer?.invalidate()
         
-        print("🚨 TOTAL ALARM TRIGGERED (Haptic) 🚨")
+        print("ðŸš¨ TOTAL ALARM TRIGGERED (Haptic) ðŸš¨")
         startHapticLoop()
     }
     
