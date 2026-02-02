@@ -69,7 +69,7 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
     private func activateAlarm(mode: AppMode, wakeTime: Date) {
         self.currentMode = mode
         self.targetWakeTime = wakeTime
-        self.statusMessage = "Starting Session..."
+        self.statusMessage = "Session Active"
         
         let windowStart = wakeTime.addingTimeInterval(-smartWindowSeconds)
         

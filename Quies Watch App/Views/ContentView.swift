@@ -46,6 +46,7 @@ struct ContentView: View {
                     .labelsHidden()
                     .datePickerStyle(.automatic)
                     .frame(height: 50)
+                    
                 
                 Button(action: {
                     alarmManager.setSmartAlarm(at: selectedTime)
@@ -161,7 +162,7 @@ struct ContentView: View {
                     }
                 }
                 Spacer()
-                Button(action: { withAnimation { alarmManager.stop() } }) {
+                Button(action: { withAnimation {alarmManager.stop() } }) {
                     HStack {
                         Image(systemName: "xmark.circle.fill")
                         Text("Stop Session").fontWeight(.semibold)
@@ -178,6 +179,9 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
+            .onDisappear() {
+                selectedTime = Date.now
+            }
         }
         .ignoresSafeArea()
         .navigationBarHidden(true)
