@@ -45,7 +45,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1A0FCC992F2B752E007C2D7F /* QuiesWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuiesWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
 		1A19BD432F222BE8001E926D /* Quies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quies.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A19BD492F222BE8001E926D /* Quies Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Quies Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -79,7 +78,6 @@
 		1A19BD3C2F222BE8001E926D = {
 			isa = PBXGroup;
 			children = (
-				1A0FCC992F2B752E007C2D7F /* QuiesWidgetExtensionExtension.entitlements */,
 				1A19BD4D2F222BE8001E926D /* Quies Watch App */,
 				1A0FCC762F2B7070007C2D7F /* Frameworks */,
 				1A19BD442F222BE8001E926D /* Products */,

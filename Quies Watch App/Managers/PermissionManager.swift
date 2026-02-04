@@ -5,14 +5,13 @@
 //  Created by Elizbar Kheladze on 14/01/26.
 //
 
-import Combine
 import Foundation
 import HealthKit
 import CoreMotion
 
-class PermissionManager: ObservableObject {
-    @Published var isAuthorized = false
-    @Published var isDenied = false
+@Observable class PermissionManager {
+    var isAuthorized = false
+    var isDenied = false
     
     private let healthStore = HKHealthStore()
     private let motionActivityManager = CMMotionActivityManager()

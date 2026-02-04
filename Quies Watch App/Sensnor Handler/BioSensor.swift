@@ -7,12 +7,11 @@
 
 import Foundation
 import CoreMotion
-import Combine
 
-class BioSensors: ObservableObject {
+@Observable class BioSensors {
     private let motionManager = CMMotionManager()
     
-    @Published var movementScore: Double = 0.0
+    var movementScore: Double = 0.0
     
     private var recentmovements: [Double] = []
         

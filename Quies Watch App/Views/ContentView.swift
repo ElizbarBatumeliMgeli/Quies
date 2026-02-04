@@ -9,8 +9,8 @@ import SwiftUI
 import WatchKit
 
 struct ContentView: View {
-    @StateObject private var alarmManager = AlarmManager()
-    @StateObject private var permissionManager = PermissionManager()
+    @State private var alarmManager = AlarmManager()
+    @State private var permissionManager = PermissionManager()
     
     @AppStorage("showOnboarding") private var showOnboarding = true
     
@@ -192,7 +192,7 @@ struct NapButton: View {
     let hours: Double
     let label: String
     let color: Color
-    @ObservedObject var manager: AlarmManager
+    @Bindable var manager: AlarmManager
     var body: some View {
         Button(action: { manager.startNap(duration: hours * 3600) }) {
             VStack(spacing: 0) {

@@ -5,7 +5,6 @@
 //  Created by Elizbar Kheladze on 05/01/26.
 //
 
-import Combine
 import Foundation
 import WatchKit
 import UserNotifications
@@ -16,13 +15,13 @@ enum AppMode {
     case smartAlarm
 }
 
-class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate {
+@Observable class AlarmManager: NSObject, WKExtendedRuntimeSessionDelegate {
     
     // MARK: - Published State
-    @Published var currentMode: AppMode = .idle
-    @Published var statusMessage: String = "Ready"
-    @Published var timerString: String = "--:--"
-    @Published var targetWakeTime: Date?
+    var currentMode: AppMode = .idle
+    var statusMessage: String = "Ready"
+    var timerString: String = "--:--"
+    var targetWakeTime: Date?
     
     // MARK: - Dependencies
     private var bioSensors = BioSensors()
@@ -159,7 +158,7 @@ class AlarmManager: NSObject, ObservableObject, WKExtendedRuntimeSessionDelegate
             }
             
             if timeLeft <= self.smartWindowSeconds {
-                if self.bioSensors.movementScore > 0.15 {
+                if self.bioSensors.movementScore > 0.10 {
                     self.triggerTotalAlarm(reason: "Light Sleep Detected")
                 }
             }

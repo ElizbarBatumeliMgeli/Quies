@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PermissionView: View {
-    @ObservedObject var manager: PermissionManager
+    @Bindable var manager: PermissionManager
     
     var body: some View {
         ScrollView {
