@@ -15,6 +15,7 @@ enum AppMode {
     case smartAlarm
 }
 
+@MainActor
 @Observable class AlarmManager: NSObject, WKExtendedRuntimeSessionDelegate {
     
     // MARK: - Published State
@@ -25,10 +26,11 @@ enum AppMode {
     
     // MARK: - Dependencies
     private var bioSensors = BioSensors()
-    private var timer: Timer?
     private var session: WKExtendedRuntimeSession?
     
-    private var hapticTimer: Timer?
+    // MARK: - Modern Concurrency
+    private var timerTask: Task<Void, Never>?
+    private var hapticTask: Task<Void, Never>?
     
     // MARK: - Configuration
     private let smartWindowSeconds: TimeInterval = 30 * 60 // 30 Minutes
@@ -80,25 +82,25 @@ enum AppMode {
         }
         
         scheduleBackupNotification(at: wakeTime)
-        startTimerLoop()
+        startTimerTask()
     }
     
     func stop() {
-        print("Stopping Alarm Manager")
         session?.invalidate()
         session = nil
         
         cancelBackupNotification()
         bioSensors.stopMonitoring()
-        timer?.invalidate()
+        
+        timerTask?.cancel()
+        timerTask = nil
+        
         stopAlarmSequence()
         
-        DispatchQueue.main.async {
-            self.currentMode = .idle
-            self.statusMessage = "Ready"
-            self.timerString = "--:--"
-            self.targetWakeTime = nil
-        }
+        self.currentMode = .idle
+        self.statusMessage = "Ready"
+        self.timerString = "--:--"
+        self.targetWakeTime = nil
     }
     
     // MARK: - Extended Runtime Session
@@ -109,19 +111,23 @@ enum AppMode {
         session?.start(at: date)
     }
     
-    func extendedRuntimeSessionDidStart(_ session: WKExtendedRuntimeSession) {
-        DispatchQueue.main.async {
+    nonisolated func extendedRuntimeSessionDidStart(_ session: WKExtendedRuntimeSession) {
+        Task { @MainActor in
             self.bioSensors.startMonitoring()
             self.statusMessage = "Scanning Sleep..."
         }
     }
     
-    func extendedRuntimeSessionWillExpire(_ session: WKExtendedRuntimeSession) {
-        triggerTotalAlarm(reason: "Session Expired")
+    nonisolated func extendedRuntimeSessionWillExpire(_ session: WKExtendedRuntimeSession) {
+        Task { @MainActor in
+            self.triggerTotalAlarm(reason: "Session Expired")
+        }
     }
     
-    func extendedRuntimeSession(_ session: WKExtendedRuntimeSession, didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason, error: Error?) {
-        stop()
+    nonisolated func extendedRuntimeSession(_ session: WKExtendedRuntimeSession, didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason, error: Error?) {
+        Task { @MainActor in
+            self.stop()
+        }
     }
 
     // MARK: - Backup Notification
@@ -143,53 +149,61 @@ enum AppMode {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["BACKUP_ALARM"])
     }
     
-    // MARK: - Timer Loop
-    private func startTimerLoop() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self, let wakeTime = self.targetWakeTime else { return }
-            
-            let timeLeft = wakeTime.timeIntervalSince(Date())
-            self.formatTimer(timeLeft: timeLeft)
-            
-            if timeLeft <= 0 {
-                self.triggerTotalAlarm(reason: "Time's Up")
-                return
-            }
-            
-            if timeLeft <= self.smartWindowSeconds {
-                if self.bioSensors.movementScore > 0.10 {
-                    self.triggerTotalAlarm(reason: "Light Sleep Detected")
+    // MARK: - Timer Task
+    private func startTimerTask() {
+        timerTask?.cancel()
+        
+        timerTask = Task {
+            while !Task.isCancelled {
+                guard let wakeTime = self.targetWakeTime else { break }
+                
+                let timeLeft = wakeTime.timeIntervalSince(Date())
+                self.formatTimer(timeLeft: timeLeft)
+                
+                if timeLeft <= 0 {
+                    self.triggerTotalAlarm(reason: "Time's Up")
+                    break
                 }
+                
+                if timeLeft <= self.smartWindowSeconds {
+                    if self.bioSensors.movementScore > 0.10 {
+                        self.triggerTotalAlarm(reason: "Light Sleep Detected")
+                        break
+                    }
+                }
+                
+                try? await Task.sleep(for: .seconds(1))
             }
         }
     }
     
-    // MARK: - ðŸš¨ TOTAL ALARM (Haptic Loop Only) ðŸš¨
+    // MARK: - Total Alarm (Haptic Loop)
     private func triggerTotalAlarm(reason: String) {
-        guard hapticTimer == nil else { return }
+        guard hapticTask == nil else { return }
         
         self.statusMessage = "WAKE UP! (\(reason))"
-        timer?.invalidate()
+        timerTask?.cancel()
         
-        print("ðŸš¨ TOTAL ALARM TRIGGERED (Haptic) ðŸš¨")
         startHapticLoop()
     }
     
     private func stopAlarmSequence() {
-        hapticTimer?.invalidate()
-        hapticTimer = nil
+        hapticTask?.cancel()
+        hapticTask = nil
     }
     
     private func startHapticLoop() {
-        hapticTimer?.invalidate()
+        hapticTask?.cancel()
         
-        WKInterfaceDevice.current().play(.failure)
-        
-        hapticTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { _ in
+        hapticTask = Task {
             WKInterfaceDevice.current().play(.failure)
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1.5))
+                
+                WKInterfaceDevice.current().play(.failure)
+                
+                try? await Task.sleep(for: .milliseconds(200))
                 WKInterfaceDevice.current().play(.failure)
             }
         }

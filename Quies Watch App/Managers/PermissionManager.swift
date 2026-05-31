@@ -9,6 +9,7 @@ import Foundation
 import HealthKit
 import CoreMotion
 
+@MainActor
 @Observable class PermissionManager {
     var isAuthorized = false
     var isDenied = false
@@ -23,11 +24,8 @@ import CoreMotion
     func checkStatus() {
         let status = CMMotionActivityManager.authorizationStatus()
         
-        DispatchQueue.main.async {
-            self.isAuthorized = (status == .authorized)
-            
-            self.isDenied = (status == .denied || status == .restricted)
-        }
+        self.isAuthorized = (status == .authorized)
+        self.isDenied = (status == .denied || status == .restricted)
     }
     
     func requestPermissions() {
@@ -37,11 +35,16 @@ import CoreMotion
                 HKObjectType.quantityType(forIdentifier: .heartRate)!,
                 HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
             ]
-            healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { _, _ in }
+            
+            // MARK: - HealthKit Request
+            Task {
+                try? await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
+            }
         }
         
         let now = Date()
-        motionActivityManager.queryActivityStarting(from: now, to: now, to: .main) { _, _ in
+        motionActivityManager.queryActivityStarting(from: now, to: now, to: .main) { [weak self] _, _ in
+            guard let self = self else { return }
             self.checkStatus()
         }
     }
